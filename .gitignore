@@ -1,0 +1,13 @@
+/vendor/
+/.phpunit.cache/
+/.phpunit.result.cache
+/.rector-cache/
+/.idea/
+/.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+/build/
+/dist/
+composer.lock

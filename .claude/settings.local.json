@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//home/robert/atlascore/core/**)",
+      "Read(//home/robert/atlascore/cassa/**)",
+      "Bash(composer install:*)",
+      "Bash(composer lint:check)",
+      "Bash(composer analyse:*)",
+      "Bash(vendor/bin/pest)",
+      "Bash(composer update:*)",
+      "Bash(vendor/bin/pest --no-coverage)",
+      "Bash(composer lint:*)"
+    ]
+  }
+}
