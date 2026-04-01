@@ -77,7 +77,7 @@ describe('§4 example: zero-VAT item with discount', function () {
                 unitPrice: '34.9900',
                 vatRate: '21.00',
             )],
-            payments: [new StubPayment(amount: '119.0359')],
+            payments: [new StubPayment(amount: '119.0380')],
         );
 
         $payload = makeSerialiser()->serialise([$order], 'realtime', '1');
@@ -88,11 +88,11 @@ describe('§4 example: zero-VAT item with discount', function () {
         expect($item['line_ex_vat'])->toBe('76.6980');
         expect($item['line_vat'])->toBe('0.0000');
         expect($anc['total_ex_vat'])->toBe('34.9900');
-        expect($anc['total_vat'])->toBe('7.3479');
+        expect($anc['total_vat'])->toBe('7.3500');
         expect($totals['items_net'])->toBe('76.6980');
         expect($totals['ancillaries_net'])->toBe('34.9900');
-        expect($totals['total_vat'])->toBe('7.3479');
-        expect($totals['grand_total'])->toBe('119.0359');
+        expect($totals['total_vat'])->toBe('7.3500');
+        expect($totals['grand_total'])->toBe('119.0380');
     });
 });
 
@@ -216,7 +216,7 @@ describe('serialiser output passes validation', function () {
         $order = new StubOrder(
             items: [new StubLineItem()],
             ancillaries: [new StubAncillary()],
-            payments: [new StubPayment(amount: '119.0359')],
+            payments: [new StubPayment(amount: '119.0380')],
         );
 
         $payload = makeSerialiser()->serialise([$order], 'realtime', '1');

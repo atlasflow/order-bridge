@@ -140,12 +140,15 @@ final class OrderSerialiser
             SchemaVersion::MONETARY_SCALE,
         );
 
-        // line_vat = line_ex_vat × vat_rate / 100
+        // line_vat = ceil(line_ex_vat × vat_rate / 100, VAT_ROUNDING_SCALE)
         $lineVat = DecimalMath::format(
-            DecimalMath::divide(
-                DecimalMath::multiply($lineExVat, $vatRate, self::CALC_SCALE),
-                '100',
-                self::CALC_SCALE,
+            DecimalMath::ceil(
+                DecimalMath::divide(
+                    DecimalMath::multiply($lineExVat, $vatRate, self::CALC_SCALE),
+                    '100',
+                    self::CALC_SCALE,
+                ),
+                SchemaVersion::VAT_ROUNDING_SCALE,
             ),
             SchemaVersion::MONETARY_SCALE,
         );
@@ -183,12 +186,15 @@ final class OrderSerialiser
             SchemaVersion::MONETARY_SCALE,
         );
 
-        // total_vat = total_ex_vat × vat_rate / 100
+        // total_vat = ceil(total_ex_vat × vat_rate / 100, VAT_ROUNDING_SCALE)
         $totalVat = DecimalMath::format(
-            DecimalMath::divide(
-                DecimalMath::multiply($totalExVat, $vatRate, self::CALC_SCALE),
-                '100',
-                self::CALC_SCALE,
+            DecimalMath::ceil(
+                DecimalMath::divide(
+                    DecimalMath::multiply($totalExVat, $vatRate, self::CALC_SCALE),
+                    '100',
+                    self::CALC_SCALE,
+                ),
+                SchemaVersion::VAT_ROUNDING_SCALE,
             ),
             SchemaVersion::MONETARY_SCALE,
         );

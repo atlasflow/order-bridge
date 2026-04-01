@@ -21,4 +21,7 @@ final class SchemaVersion
 
     /** bcmath scale for discount percentage strings. */
     public const int DISCOUNT_SCALE = 6;
+
+    /** Decimal places to which VAT amounts are ceiled (cents). */
+    public const int VAT_ROUNDING_SCALE = 2;
 }

@@ -436,11 +436,14 @@ final class PayloadValidator
                 ));
             }
 
-            // line_vat = line_ex_vat × vat_rate / 100
-            $expectedLineVat = DecimalMath::divide(
-                DecimalMath::multiply($lineExVat, $vatRate, $scale),
-                '100',
-                $scale,
+            // line_vat = ceil(line_ex_vat × vat_rate / 100, VAT_ROUNDING_SCALE)
+            $expectedLineVat = DecimalMath::ceil(
+                DecimalMath::divide(
+                    DecimalMath::multiply($lineExVat, $vatRate, $scale),
+                    '100',
+                    $scale,
+                ),
+                SchemaVersion::VAT_ROUNDING_SCALE,
             );
 
             if (!DecimalMath::withinTolerance($lineVat, $expectedLineVat, SchemaVersion::TOLERANCE)) {
@@ -496,11 +499,14 @@ final class PayloadValidator
                 ));
             }
 
-            // total_vat = total_ex_vat × vat_rate / 100
-            $expectedTotalVat = DecimalMath::divide(
-                DecimalMath::multiply($totalExVat, $vatRate, $scale),
-                '100',
-                $scale,
+            // total_vat = ceil(total_ex_vat × vat_rate / 100, VAT_ROUNDING_SCALE)
+            $expectedTotalVat = DecimalMath::ceil(
+                DecimalMath::divide(
+                    DecimalMath::multiply($totalExVat, $vatRate, $scale),
+                    '100',
+                    $scale,
+                ),
+                SchemaVersion::VAT_ROUNDING_SCALE,
             );
             if (!DecimalMath::withinTolerance($totalVat, $expectedTotalVat, SchemaVersion::TOLERANCE)) {
                 $result->addViolation(new ValidationViolation(
