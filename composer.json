@@ -12,6 +12,9 @@
         "bridge",
         "php"
     ],
+    "suggest": {
+        "illuminate/support": "Required to use the Laravel service provider (OrderBridgeServiceProvider)."
+    },
     "require": {
         "php": "^8.4",
         "ext-bcmath": "*",
@@ -68,6 +71,13 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Atlasflow\\OrderBridge\\Laravel\\OrderBridgeServiceProvider"
+            ]
         }
     },
     "minimum-stability": "stable",
