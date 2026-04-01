@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Atlasflow\OrderBridge\Support\DecimalMath;
+use Atlasflow\OrderBridge\Support\RoundingMode;
 
 describe('DecimalMath::multiply', function () {
     it('multiplies two positive decimals', function () {
@@ -76,6 +77,49 @@ describe('DecimalMath::format', function () {
 
     it('handles exact 4-decimal input unchanged', function () {
         expect(DecimalMath::format('7.3479', 4))->toBe('7.3479');
+    });
+});
+
+describe('DecimalMath::round — Ceil', function () {
+    it('rounds up a positive value with remainder', function () {
+        // 34.99 × 21 / 100 = 7.3479 → ceil to 2 dp = 7.35
+        expect(DecimalMath::round('7.3479', 2, RoundingMode::Ceil))->toBe('7.35');
+    });
+
+    it('does not change a value that is already exact', function () {
+        expect(DecimalMath::round('7.35', 2, RoundingMode::Ceil))->toBe('7.35');
+    });
+
+    it('does not change a zero-remainder value', function () {
+        expect(DecimalMath::round('2.00', 2, RoundingMode::Ceil))->toBe('2.00');
+    });
+
+    it('truncates a negative value toward zero (mathematical ceiling)', function () {
+        // -7.3479 → ceil to 2 dp = -7.34
+        expect(DecimalMath::round('-7.3479', 2, RoundingMode::Ceil))->toBe('-7.34');
+    });
+
+    it('works with zero', function () {
+        expect(DecimalMath::round('0.0000', 2, RoundingMode::Ceil))->toBe('0.00');
+    });
+});
+
+describe('DecimalMath::round — Floor', function () {
+    it('truncates a positive value toward zero (mathematical floor)', function () {
+        expect(DecimalMath::round('7.3479', 2, RoundingMode::Floor))->toBe('7.34');
+    });
+
+    it('does not change a value that is already exact', function () {
+        expect(DecimalMath::round('7.35', 2, RoundingMode::Floor))->toBe('7.35');
+    });
+
+    it('rounds a negative value away from zero', function () {
+        // -7.3479 → floor to 2 dp = -7.35
+        expect(DecimalMath::round('-7.3479', 2, RoundingMode::Floor))->toBe('-7.35');
+    });
+
+    it('works with zero', function () {
+        expect(DecimalMath::round('0.0000', 2, RoundingMode::Floor))->toBe('0.00');
     });
 });
 

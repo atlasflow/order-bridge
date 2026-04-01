@@ -73,24 +73,34 @@ final class DecimalMath
     }
 
     /**
-     * Ceiling-round a bcmath string to exactly $decimals decimal places.
+     * Round a bcmath string to exactly $decimals decimal places using the given mode.
      *
-     * Positive values with a fractional remainder beyond $decimals are rounded up.
-     * Negative values are truncated toward zero (which is the mathematical ceiling).
+     * - RoundingMode::Ceil  — toward positive infinity: positive values with a remainder
+     *   beyond $decimals are incremented by one unit; negative values are truncated toward zero.
+     * - RoundingMode::Floor — toward negative infinity: positive values are truncated toward zero;
+     *   negative values with a remainder beyond $decimals are decremented by one unit.
      *
-     * @param int $decimals Target decimal places (e.g. 2 for cent-level rounding).
+     * @param int         $decimals Target decimal places (e.g. 2 for cent-level rounding).
+     * @param RoundingMode $mode    Rounding direction.
      */
-    public static function ceil(string $value, int $decimals): string
+    public static function round(string $value, int $decimals, RoundingMode $mode): string
     {
         $truncated = bcadd($value, '0', $decimals);
+        $unit = $decimals > 0 ? '0.' . str_repeat('0', $decimals - 1) . '1' : '1';
+        $lookScale = $decimals + 4;
 
-        // For positive values: if truncation dropped any fraction, add one unit.
-        if (bccomp($value, '0', $decimals + 4) > 0 && bccomp($value, $truncated, $decimals + 4) > 0) {
-            $unit = $decimals > 0 ? '0.' . str_repeat('0', $decimals - 1) . '1' : '1';
-            return bcadd($truncated, $unit, $decimals);
-        }
-
-        return $truncated;
+        return match ($mode) {
+            RoundingMode::Ceil => (
+                bccomp($value, '0', $lookScale) > 0 && bccomp($value, $truncated, $lookScale) > 0
+                    ? bcadd($truncated, $unit, $decimals)
+                    : $truncated
+            ),
+            RoundingMode::Floor => (
+                bccomp($value, '0', $lookScale) < 0 && bccomp($value, $truncated, $lookScale) < 0
+                    ? bcsub($truncated, $unit, $decimals)
+                    : $truncated
+            ),
+        };
     }
 
     /**
@@ -100,7 +110,7 @@ final class DecimalMath
      */
     public static function withinTolerance(string $a, string $b, string $tolerance): bool
     {
-        $scale = SchemaVersion::MONETARY_SCALE + 4;
+        $scale = SchemaVersion::monetaryScale() + 4;
         $diff = bcsub($a, $b, $scale);
 
         if (bccomp($diff, '0', $scale) < 0) {

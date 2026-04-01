@@ -287,7 +287,7 @@ final class PayloadValidator
 
             // All monetary amounts must be positive for refund orders
             $grandTotal = $totals['grand_total'] ?? null;
-            if (is_string($grandTotal) && is_numeric($grandTotal) && bccomp($grandTotal, '0', SchemaVersion::MONETARY_SCALE) <= 0) {
+            if (is_string($grandTotal) && is_numeric($grandTotal) && bccomp($grandTotal, '0', SchemaVersion::monetaryScale()) <= 0) {
                 $result->addViolation(new ValidationViolation(
                     "{$prefix}.totals.grand_total",
                     'refund_amounts_positive',
@@ -412,7 +412,7 @@ final class PayloadValidator
             $lineExVat = (string) $item['line_ex_vat'];
             $lineVat = (string) $item['line_vat'];
 
-            $scale = SchemaVersion::MONETARY_SCALE + 6;
+            $scale = SchemaVersion::monetaryScale() + 6;
 
             // line_ex_vat = qty × unit_price × (100 − discount) / 100
             $factor = DecimalMath::divide(
@@ -426,32 +426,33 @@ final class PayloadValidator
                 $scale,
             );
 
-            if (!DecimalMath::withinTolerance($lineExVat, $expectedLineExVat, SchemaVersion::TOLERANCE)) {
+            if (!DecimalMath::withinTolerance($lineExVat, $expectedLineExVat, SchemaVersion::tolerance())) {
                 $result->addViolation(new ValidationViolation(
                     "{$linePrefix}.line_ex_vat",
                     'line_ex_vat_arithmetic',
                     "line_ex_vat does not match qty × unit_price × (100 − discount) / 100 within tolerance.",
-                    DecimalMath::format($expectedLineExVat, SchemaVersion::MONETARY_SCALE),
+                    DecimalMath::format($expectedLineExVat, SchemaVersion::monetaryScale()),
                     $lineExVat,
                 ));
             }
 
-            // line_vat = ceil(line_ex_vat × vat_rate / 100, VAT_ROUNDING_SCALE)
-            $expectedLineVat = DecimalMath::ceil(
+            // line_vat = round(line_ex_vat × vat_rate / 100, vatRoundingScale, vatRoundingMode)
+            $expectedLineVat = DecimalMath::round(
                 DecimalMath::divide(
                     DecimalMath::multiply($lineExVat, $vatRate, $scale),
                     '100',
                     $scale,
                 ),
-                SchemaVersion::VAT_ROUNDING_SCALE,
+                SchemaVersion::vatRoundingScale(),
+                SchemaVersion::vatRoundingMode(),
             );
 
-            if (!DecimalMath::withinTolerance($lineVat, $expectedLineVat, SchemaVersion::TOLERANCE)) {
+            if (!DecimalMath::withinTolerance($lineVat, $expectedLineVat, SchemaVersion::tolerance())) {
                 $result->addViolation(new ValidationViolation(
                     "{$linePrefix}.line_vat",
                     'line_vat_arithmetic',
                     "line_vat does not match line_ex_vat × vat_rate / 100 within tolerance.",
-                    DecimalMath::format($expectedLineVat, SchemaVersion::MONETARY_SCALE),
+                    DecimalMath::format($expectedLineVat, SchemaVersion::monetaryScale()),
                     $lineVat,
                 ));
             }
@@ -485,35 +486,36 @@ final class PayloadValidator
             $totalExVat = (string) $anc['total_ex_vat'];
             $totalVat = (string) $anc['total_vat'];
 
-            $scale = SchemaVersion::MONETARY_SCALE + 6;
+            $scale = SchemaVersion::monetaryScale() + 6;
 
             // total_ex_vat = qty × unit_price
             $expectedTotalExVat = DecimalMath::multiply($qty, $unitPrice, $scale);
-            if (!DecimalMath::withinTolerance($totalExVat, $expectedTotalExVat, SchemaVersion::TOLERANCE)) {
+            if (!DecimalMath::withinTolerance($totalExVat, $expectedTotalExVat, SchemaVersion::tolerance())) {
                 $result->addViolation(new ValidationViolation(
                     "{$ancPrefix}.total_ex_vat",
                     'total_ex_vat_arithmetic',
                     "total_ex_vat does not match qty × unit_price within tolerance.",
-                    DecimalMath::format($expectedTotalExVat, SchemaVersion::MONETARY_SCALE),
+                    DecimalMath::format($expectedTotalExVat, SchemaVersion::monetaryScale()),
                     $totalExVat,
                 ));
             }
 
-            // total_vat = ceil(total_ex_vat × vat_rate / 100, VAT_ROUNDING_SCALE)
-            $expectedTotalVat = DecimalMath::ceil(
+            // total_vat = round(total_ex_vat × vat_rate / 100, vatRoundingScale, vatRoundingMode)
+            $expectedTotalVat = DecimalMath::round(
                 DecimalMath::divide(
                     DecimalMath::multiply($totalExVat, $vatRate, $scale),
                     '100',
                     $scale,
                 ),
-                SchemaVersion::VAT_ROUNDING_SCALE,
+                SchemaVersion::vatRoundingScale(),
+                SchemaVersion::vatRoundingMode(),
             );
-            if (!DecimalMath::withinTolerance($totalVat, $expectedTotalVat, SchemaVersion::TOLERANCE)) {
+            if (!DecimalMath::withinTolerance($totalVat, $expectedTotalVat, SchemaVersion::tolerance())) {
                 $result->addViolation(new ValidationViolation(
                     "{$ancPrefix}.total_vat",
                     'total_vat_arithmetic',
                     "total_vat does not match total_ex_vat × vat_rate / 100 within tolerance.",
-                    DecimalMath::format($expectedTotalVat, SchemaVersion::MONETARY_SCALE),
+                    DecimalMath::format($expectedTotalVat, SchemaVersion::monetaryScale()),
                     $totalVat,
                 ));
             }
@@ -522,40 +524,40 @@ final class PayloadValidator
             $totalVatSum = DecimalMath::add($totalVatSum, $totalVat, $scale);
         }
 
-        $scale = SchemaVersion::MONETARY_SCALE + 6;
+        $scale = SchemaVersion::monetaryScale() + 6;
 
         // sum(line_ex_vat) = totals.items_net
         $itemsNet = (string) ($totals['items_net'] ?? '0');
-        if (is_numeric($itemsNet) && !DecimalMath::withinTolerance($itemsNetSum, $itemsNet, SchemaVersion::TOLERANCE)) {
+        if (is_numeric($itemsNet) && !DecimalMath::withinTolerance($itemsNetSum, $itemsNet, SchemaVersion::tolerance())) {
             $result->addViolation(new ValidationViolation(
                 "{$prefix}.totals.items_net",
                 'items_net_mismatch',
                 'totals.items_net does not equal the sum of all line_ex_vat values within tolerance.',
-                DecimalMath::format($itemsNetSum, SchemaVersion::MONETARY_SCALE),
+                DecimalMath::format($itemsNetSum, SchemaVersion::monetaryScale()),
                 $itemsNet,
             ));
         }
 
         // sum(total_ex_vat across ancillaries) = totals.ancillaries_net
         $ancillariesNet = (string) ($totals['ancillaries_net'] ?? '0');
-        if (is_numeric($ancillariesNet) && !DecimalMath::withinTolerance($ancillariesNetSum, $ancillariesNet, SchemaVersion::TOLERANCE)) {
+        if (is_numeric($ancillariesNet) && !DecimalMath::withinTolerance($ancillariesNetSum, $ancillariesNet, SchemaVersion::tolerance())) {
             $result->addViolation(new ValidationViolation(
                 "{$prefix}.totals.ancillaries_net",
                 'ancillaries_net_mismatch',
                 'totals.ancillaries_net does not equal the sum of all ancillary total_ex_vat values within tolerance.',
-                DecimalMath::format($ancillariesNetSum, SchemaVersion::MONETARY_SCALE),
+                DecimalMath::format($ancillariesNetSum, SchemaVersion::monetaryScale()),
                 $ancillariesNet,
             ));
         }
 
         // sum(line_vat + ancillary total_vat) = totals.total_vat
         $totalVat = (string) ($totals['total_vat'] ?? '0');
-        if (is_numeric($totalVat) && !DecimalMath::withinTolerance($totalVatSum, $totalVat, SchemaVersion::TOLERANCE)) {
+        if (is_numeric($totalVat) && !DecimalMath::withinTolerance($totalVatSum, $totalVat, SchemaVersion::tolerance())) {
             $result->addViolation(new ValidationViolation(
                 "{$prefix}.totals.total_vat",
                 'total_vat_mismatch',
                 'totals.total_vat does not equal the sum of all line_vat and ancillary total_vat values within tolerance.',
-                DecimalMath::format($totalVatSum, SchemaVersion::MONETARY_SCALE),
+                DecimalMath::format($totalVatSum, SchemaVersion::monetaryScale()),
                 $totalVat,
             ));
         }
@@ -568,12 +570,12 @@ final class PayloadValidator
                 $totalVat,
                 $scale,
             );
-            if (!DecimalMath::withinTolerance($grandTotal, $expectedGrandTotal, SchemaVersion::TOLERANCE)) {
+            if (!DecimalMath::withinTolerance($grandTotal, $expectedGrandTotal, SchemaVersion::tolerance())) {
                 $result->addViolation(new ValidationViolation(
                     "{$prefix}.totals.grand_total",
                     'grand_total_arithmetic',
                     'grand_total does not equal items_net + ancillaries_net + total_vat within tolerance.',
-                    DecimalMath::format($expectedGrandTotal, SchemaVersion::MONETARY_SCALE),
+                    DecimalMath::format($expectedGrandTotal, SchemaVersion::monetaryScale()),
                     $grandTotal,
                 ));
             }
@@ -586,7 +588,7 @@ final class PayloadValidator
      */
     private function validatePayments(array $payments, array $totals, string $prefix, ValidationResult $result): void
     {
-        $scale = SchemaVersion::MONETARY_SCALE + 4;
+        $scale = SchemaVersion::monetaryScale() + 4;
         $paymentSum = '0';
 
         foreach ($payments as $i => $payment) {
@@ -630,13 +632,13 @@ final class PayloadValidator
 
         // sum of payment amounts must equal grand_total
         $grandTotal = (string) ($totals['grand_total'] ?? '0');
-        if (is_numeric($grandTotal) && !DecimalMath::withinTolerance($paymentSum, $grandTotal, SchemaVersion::TOLERANCE)) {
+        if (is_numeric($grandTotal) && !DecimalMath::withinTolerance($paymentSum, $grandTotal, SchemaVersion::tolerance())) {
             $result->addViolation(new ValidationViolation(
                 "{$prefix}.payments",
                 'payment_sum_mismatch',
                 'The sum of all payment amounts must equal totals.grand_total within tolerance.',
                 $grandTotal,
-                DecimalMath::format($paymentSum, SchemaVersion::MONETARY_SCALE),
+                DecimalMath::format($paymentSum, SchemaVersion::monetaryScale()),
             ));
         }
     }

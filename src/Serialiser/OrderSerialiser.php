@@ -137,20 +137,21 @@ final class OrderSerialiser
                 $discountFactor,
                 self::CALC_SCALE,
             ),
-            SchemaVersion::MONETARY_SCALE,
+            SchemaVersion::monetaryScale(),
         );
 
-        // line_vat = ceil(line_ex_vat × vat_rate / 100, VAT_ROUNDING_SCALE)
+        // line_vat = round(line_ex_vat × vat_rate / 100, vatRoundingScale, vatRoundingMode)
         $lineVat = DecimalMath::format(
-            DecimalMath::ceil(
+            DecimalMath::round(
                 DecimalMath::divide(
                     DecimalMath::multiply($lineExVat, $vatRate, self::CALC_SCALE),
                     '100',
                     self::CALC_SCALE,
                 ),
-                SchemaVersion::VAT_ROUNDING_SCALE,
+                SchemaVersion::vatRoundingScale(),
+                SchemaVersion::vatRoundingMode(),
             ),
-            SchemaVersion::MONETARY_SCALE,
+            SchemaVersion::monetaryScale(),
         );
 
         return [
@@ -183,20 +184,21 @@ final class OrderSerialiser
         // total_ex_vat = qty × unit_price
         $totalExVat = DecimalMath::format(
             DecimalMath::multiply($qty, $unitPrice, self::CALC_SCALE),
-            SchemaVersion::MONETARY_SCALE,
+            SchemaVersion::monetaryScale(),
         );
 
-        // total_vat = ceil(total_ex_vat × vat_rate / 100, VAT_ROUNDING_SCALE)
+        // total_vat = round(total_ex_vat × vat_rate / 100, vatRoundingScale, vatRoundingMode)
         $totalVat = DecimalMath::format(
-            DecimalMath::ceil(
+            DecimalMath::round(
                 DecimalMath::divide(
                     DecimalMath::multiply($totalExVat, $vatRate, self::CALC_SCALE),
                     '100',
                     self::CALC_SCALE,
                 ),
-                SchemaVersion::VAT_ROUNDING_SCALE,
+                SchemaVersion::vatRoundingScale(),
+                SchemaVersion::vatRoundingMode(),
             ),
-            SchemaVersion::MONETARY_SCALE,
+            SchemaVersion::monetaryScale(),
         );
 
         return [
@@ -243,10 +245,10 @@ final class OrderSerialiser
         );
 
         return [
-            'items_net' => DecimalMath::format($itemsNet, SchemaVersion::MONETARY_SCALE),
-            'ancillaries_net' => DecimalMath::format($ancillariesNet, SchemaVersion::MONETARY_SCALE),
-            'total_vat' => DecimalMath::format($totalVat, SchemaVersion::MONETARY_SCALE),
-            'grand_total' => DecimalMath::format($grandTotal, SchemaVersion::MONETARY_SCALE),
+            'items_net' => DecimalMath::format($itemsNet, SchemaVersion::monetaryScale()),
+            'ancillaries_net' => DecimalMath::format($ancillariesNet, SchemaVersion::monetaryScale()),
+            'total_vat' => DecimalMath::format($totalVat, SchemaVersion::monetaryScale()),
+            'grand_total' => DecimalMath::format($grandTotal, SchemaVersion::monetaryScale()),
             'refund_of' => $refundOf,
         ];
     }
