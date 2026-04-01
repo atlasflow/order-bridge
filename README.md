@@ -132,8 +132,52 @@ If you need to retry a failed transport attempt:
 
 ## Laravel Integration
 
-For Laravel applications, we recommend using the optional bridge for cleaner integration:
-[atlasflow/order-bridge-laravel](https://github.com/atlasflow/order-bridge-laravel) (coming soon).
+The package ships with a first-class Laravel service provider that handles configuration publishing and wires everything up automatically.
+
+### Auto-discovery
+
+Laravel 5.5+ will auto-discover the service provider. No manual registration is needed.
+
+### Publish the configuration file
+
+```bash
+php artisan vendor:publish --tag=order-bridge-config
+```
+
+This copies `config/order-bridge.php` into your application's `config/` directory.
+
+### Configuration reference
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `tolerance` | `'0.0001'` | Arithmetic tolerance for §5.3 validation checks. |
+| `monetary_scale` | `4` | Decimal places for all monetary output fields. |
+| `discount_scale` | `6` | Decimal places for discount percentage strings. |
+| `vat_rounding_scale` | `2` | Decimal places to which VAT amounts are rounded before output. Set to `4` to disable the extra rounding step. |
+| `vat_rounding_mode` | `'ceil'` | Rounding direction for VAT amounts. `'ceil'` rounds toward positive infinity (always up for positive values); `'floor'` rounds toward negative infinity. |
+
+### Manual registration (without auto-discovery)
+
+Add the provider to `config/app.php`:
+
+```php
+'providers' => [
+    Atlasflow\OrderBridge\Laravel\OrderBridgeServiceProvider::class,
+],
+```
+
+### Framework-agnostic usage
+
+Outside of Laravel the package works out of the box with sensible defaults. If you need to override the defaults at runtime, call `SchemaVersion::configure()` early in your bootstrap:
+
+```php
+use Atlasflow\OrderBridge\SchemaVersion;
+
+SchemaVersion::configure([
+    'vat_rounding_mode' => 'floor',
+    'vat_rounding_scale' => 2,
+]);
+```
 
 ---
 
