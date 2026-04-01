@@ -90,7 +90,7 @@ describe('InboundParser — valid payload', function () {
         expect($anc->unitPrice)->toBe('34.9900');
         expect($anc->vatRate)->toBe('21.00');
         expect($anc->totalExVat)->toBe('34.9900');
-        expect($anc->totalVat)->toBe('7.3479');
+        expect($anc->totalVat)->toBe('7.3500');
     });
 
     it('maps totals correctly', function () {
@@ -99,8 +99,8 @@ describe('InboundParser — valid payload', function () {
 
         expect($totals->itemsNet)->toBe('76.6980');
         expect($totals->ancillariesNet)->toBe('34.9900');
-        expect($totals->totalVat)->toBe('7.3479');
-        expect($totals->grandTotal)->toBe('119.0359');
+        expect($totals->totalVat)->toBe('7.3500');
+        expect($totals->grandTotal)->toBe('119.0380');
         expect($totals->refundOf)->toBeNull();
     });
 
@@ -109,7 +109,7 @@ describe('InboundParser — valid payload', function () {
         $payment = $dto->orders[0]->payments[0];
 
         expect($payment->method)->toBe('card');
-        expect($payment->amount)->toBe('119.0359');
+        expect($payment->amount)->toBe('119.0380');
         expect($payment->reference)->toBe('TXN-STRIPE-89234');
         expect($payment->date)->toBe('2026-03-21T10:44:11Z');
     });

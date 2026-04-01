@@ -73,6 +73,27 @@ final class DecimalMath
     }
 
     /**
+     * Ceiling-round a bcmath string to exactly $decimals decimal places.
+     *
+     * Positive values with a fractional remainder beyond $decimals are rounded up.
+     * Negative values are truncated toward zero (which is the mathematical ceiling).
+     *
+     * @param int $decimals Target decimal places (e.g. 2 for cent-level rounding).
+     */
+    public static function ceil(string $value, int $decimals): string
+    {
+        $truncated = bcadd($value, '0', $decimals);
+
+        // For positive values: if truncation dropped any fraction, add one unit.
+        if (bccomp($value, '0', $decimals + 4) > 0 && bccomp($value, $truncated, $decimals + 4) > 0) {
+            $unit = $decimals > 0 ? '0.' . str_repeat('0', $decimals - 1) . '1' : '1';
+            return bcadd($truncated, $unit, $decimals);
+        }
+
+        return $truncated;
+    }
+
+    /**
      * Return true if the absolute difference between $a and $b is within $tolerance.
      *
      * Used to implement the ±0.0001 tolerance checks defined in §5.3.

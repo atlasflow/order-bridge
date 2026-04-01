@@ -3,7 +3,6 @@
     "name": "atlasflow/order-bridge",
     "description": "Serialisation, validation and transport for the Atlas Core Order Bridge API.",
     "type": "library",
-    "version": "1.0.0",
     "license": "proprietary",
     "keywords": [
         "atlasflow",

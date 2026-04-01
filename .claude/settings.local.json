@@ -9,7 +9,8 @@
       "Bash(vendor/bin/pest)",
       "Bash(composer update:*)",
       "Bash(vendor/bin/pest --no-coverage)",
-      "Bash(composer lint:*)"
+      "Bash(composer lint:*)",
+      "Bash(composer test:*)"
     ]
   }
 }

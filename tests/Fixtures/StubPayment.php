@@ -11,7 +11,7 @@ final class StubPayment implements PaymentInterface
 {
     public function __construct(
         public string $method = 'card',
-        public string $amount = '119.0359',
+        public string $amount = '119.0380',
         public ?string $reference = 'TXN-STRIPE-89234',
         public string $date = '2026-03-21T10:44:11Z',
     ) {
