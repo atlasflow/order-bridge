@@ -302,6 +302,9 @@ final class OrderSerialiser
     private function serialiseFulfilment(FulfilmentInterface $fulfilment): array
     {
         $slot = $fulfilment->getDeliverySlot();
+        $notes = $fulfilment->getNotes() !== null
+            ? array_map([$this, 'serialiseNote'], $fulfilment->getNotes())
+            : null;
 
         return [
             'type' => $fulfilment->getType(),
@@ -311,7 +314,7 @@ final class OrderSerialiser
                 'notes' => $slot['notes'] ?? null,
             ] : null,
             'delivery_address' => $fulfilment->getDeliveryAddress(),
-            'notes' => $fulfilment->getNotes(),
+            'notes' => $notes,
         ];
     }
 

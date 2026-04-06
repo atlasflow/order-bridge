@@ -248,11 +248,15 @@ final class InboundParser
             ? $this->mapDeliverySlot($data['delivery_slot'])
             : null;
 
+        $notes = isset($data['notes']) && is_array($data['notes'])
+            ? array_map([$this, 'mapNote'], $data['notes'])
+            : null;
+
         return new FulfilmentDto(
             type: $data['type'],
             deliveryAddress: $deliveryAddress,
             deliverySlot: $deliverySlot,
-            notes: $data['notes'] ?? null,
+            notes: $notes,
         );
     }
 

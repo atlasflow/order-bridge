@@ -9,7 +9,7 @@ use Atlasflow\OrderBridge\Support\DecimalMath;
 
 /**
  * Validates a transfer payload array against all rules defined in §5 of the
- * Atlas Core Order Bridge API specification (version 1.3.4).
+ * Atlas Core Order Bridge API specification (version 1.4.2).
  *
  * Validates the envelope (§5.1), each order (§5.2), each line item and
  * ancillary (§5.3), and idempotency fields (§5.4).
@@ -365,6 +365,44 @@ final class PayloadValidator
                 'delivery_address_required',
                 "{$prefix}.fulfilment.delivery_address is required when fulfilment.type is \"delivery\".",
             ));
+        }
+
+        // notes, when present, must be an array of note objects
+        if (array_key_exists('notes', $fulfilment) && $fulfilment['notes'] !== null) {
+            if (!is_array($fulfilment['notes'])) {
+                $result->addViolation(new ValidationViolation(
+                    "{$prefix}.fulfilment.notes",
+                    'fulfilment_notes_must_be_array',
+                    "{$prefix}.fulfilment.notes must be an array of note objects or null.",
+                ));
+            } else {
+                foreach ($fulfilment['notes'] as $i => $note) {
+                    $this->validateNote($note, "{$prefix}.fulfilment.notes.{$i}", $result);
+                }
+            }
+        }
+    }
+
+    /** @param mixed $note */
+    private function validateNote(mixed $note, string $prefix, ValidationResult $result): void
+    {
+        if (!is_array($note)) {
+            $result->addViolation(new ValidationViolation(
+                $prefix,
+                'note_must_be_object',
+                "{$prefix} must be a note object.",
+            ));
+            return;
+        }
+
+        foreach (['type', 'note', 'created_by', 'created_at'] as $field) {
+            if (empty($note[$field])) {
+                $result->addViolation(new ValidationViolation(
+                    "{$prefix}.{$field}",
+                    'field_required',
+                    "{$prefix}.{$field} is required.",
+                ));
+            }
         }
     }
 

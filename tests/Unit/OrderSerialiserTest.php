@@ -27,9 +27,9 @@ function makeSerialiser(array $configOverrides = []): OrderSerialiser
 // ---------------------------------------------------------------------------
 
 describe('envelope fields', function () {
-    it('sets schema_version to 1.4.1', function () {
+    it('sets schema_version to 1.4.2', function () {
         $payload = makeSerialiser()->serialise([new StubOrder()], 'realtime');
-        expect($payload['schema_version'])->toBe('1.4.1');
+        expect($payload['schema_version'])->toBe('1.4.2');
     });
 
     it('sets trigger from argument', function () {

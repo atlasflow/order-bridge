@@ -24,7 +24,7 @@ describe('InboundParser — valid payload', function () {
         $dto = parsePayload(ExamplePayload::valid());
 
         expect($dto)->toBeInstanceOf(EnvelopeDto::class);
-        expect($dto->schemaVersion)->toBe('1.4.1');
+        expect($dto->schemaVersion)->toBe('1.4.2');
         expect($dto->transferId)->toBe('7322b271-e5e2-42d9-a42e-e4c4fb45a3f8');
         expect($dto->trigger)->toBe('realtime');
         expect($dto->sourceSiteId)->toBe('site_richmond');
@@ -35,7 +35,7 @@ describe('InboundParser — valid payload', function () {
     it('parses the canonical §4 example from a JSON string', function () {
         $json = json_encode(ExamplePayload::valid(), JSON_THROW_ON_ERROR);
         $dto = parsePayload($json);
-        expect($dto->schemaVersion)->toBe('1.4.1');
+        expect($dto->schemaVersion)->toBe('1.4.2');
     });
 
     it('maps order fields correctly', function () {
@@ -65,7 +65,9 @@ describe('InboundParser — valid payload', function () {
         $fulfilment = $dto->orders[0]->fulfilment;
 
         expect($fulfilment->type)->toBe('collection');
-        expect($fulfilment->notes)->toBe('Collecting Friday afternoon');
+        expect($fulfilment->notes)->toBeArray();
+        expect($fulfilment->notes[0]->note)->toBe('Collecting Friday afternoon');
+        expect($fulfilment->notes[0]->type)->toBe('ops');
         expect($fulfilment->deliveryAddress)->toBeNull();
     });
 

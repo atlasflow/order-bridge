@@ -2,7 +2,7 @@
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE.md)
 
-A framework-agnostic PHP package for serialising, validating, and transporting orders between Atlas Core and host applications (ePOS, E-commerce, etc.) according to the **Order Bridge API Specification v1.3.4**.
+A framework-agnostic PHP package for serialising, validating, and transporting orders between Atlas Core and host applications (ePOS, E-commerce, etc.) according to the **Order Bridge API Specification v1.4.2**.
 
 ## Core Concepts
 
@@ -28,7 +28,7 @@ It is designed to be **unopinionated about persistence**. It does not include El
 composer require atlasflow/order-bridge
 ```
 
-*Note: Requires PHP 8.3+ and the `bcmath` extension.*
+*Note: Requires PHP 8.4+ and the `bcmath` extension.*
 
 ---
 

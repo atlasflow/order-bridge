@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Atlasflow\OrderBridge\Contracts;
 
+use Atlasflow\OrderBridge\Dto\NoteDto;
+
 /**
  * Describes how and where an order will be delivered or collected.
  *
@@ -35,6 +37,10 @@ interface FulfilmentInterface
      */
     public function getDeliverySlot(): ?array;
 
-    /** Optional free-text fulfilment notes (e.g. delivery instructions). */
-    public function getNotes(): ?string;
+    /**
+     * Optional fulfilment-level notes. Null when no notes are present.
+     *
+     * @return NoteDto[]|null
+     */
+    public function getNotes(): ?array;
 }
