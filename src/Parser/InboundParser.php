@@ -11,6 +11,7 @@ use Atlasflow\OrderBridge\Dto\DeliverySlotDto;
 use Atlasflow\OrderBridge\Dto\EnvelopeDto;
 use Atlasflow\OrderBridge\Dto\FulfilmentDto;
 use Atlasflow\OrderBridge\Dto\LineItemDto;
+use Atlasflow\OrderBridge\Dto\NoteDto;
 use Atlasflow\OrderBridge\Dto\OrderDto;
 use Atlasflow\OrderBridge\Dto\PaymentDto;
 use Atlasflow\OrderBridge\Dto\TotalsDto;
@@ -98,6 +99,9 @@ final class InboundParser
         $ancillaries = isset($data['ancillaries']) && is_array($data['ancillaries'])
             ? array_map([$this, 'mapAncillary'], $data['ancillaries'])
             : null;
+        $notes = isset($data['notes']) && is_array($data['notes'])
+            ? array_map([$this, 'mapNote'], $data['notes'])
+            : null;
         $payments = array_map([$this, 'mapPayment'], $data['payments']);
 
         return new OrderDto(
@@ -106,7 +110,7 @@ final class InboundParser
             channel: $data['channel'],
             operatorId: $data['operator_id'] ?? null,
             orderedAt: $data['ordered_at'],
-            notes: $data['notes'] ?? null,
+            notes: $notes,
             customer: $this->mapCustomer($data['customer']),
             fulfilment: $this->mapFulfilment($data['fulfilment']),
             items: $items,
@@ -123,6 +127,10 @@ final class InboundParser
     /** @param array<string, mixed> $data */
     private function mapLineItem(array $data): LineItemDto
     {
+        $note = isset($data['note']) && is_array($data['note'])
+            ? $this->mapNote($data['note'])
+            : null;
+
         return new LineItemDto(
             sku: $data['sku'],
             name: $data['name'],
@@ -133,7 +141,7 @@ final class InboundParser
             vatRate: $data['vat_rate'],
             batch: $data['batch'] ?? null,
             passport: $data['passport'] ?? null,
-            notes: $data['notes'] ?? null,
+            note: $note,
             lineExVat: $data['line_ex_vat'],
             lineVat: $data['line_vat'],
         );
@@ -154,6 +162,21 @@ final class InboundParser
             description: $data['description'] ?? null,
             totalExVat: $data['total_ex_vat'],
             totalVat: $data['total_vat'],
+        );
+    }
+
+    // -------------------------------------------------------------------------
+    // Note
+    // -------------------------------------------------------------------------
+
+    /** @param array<string, mixed> $data */
+    private function mapNote(array $data): NoteDto
+    {
+        return new NoteDto(
+            type: $data['type'],
+            note: $data['note'],
+            createdBy: $data['created_by'],
+            createdAt: $data['created_at'],
         );
     }
 

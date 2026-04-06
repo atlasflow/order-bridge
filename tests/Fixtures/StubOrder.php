@@ -10,6 +10,7 @@ use Atlasflow\OrderBridge\Contracts\FulfilmentInterface;
 use Atlasflow\OrderBridge\Contracts\LineItemInterface;
 use Atlasflow\OrderBridge\Contracts\OrderInterface;
 use Atlasflow\OrderBridge\Contracts\PaymentInterface;
+use Atlasflow\OrderBridge\Dto\NoteDto;
 
 /**
  * Minimal OrderInterface stub for tests.
@@ -17,9 +18,11 @@ use Atlasflow\OrderBridge\Contracts\PaymentInterface;
  */
 final class StubOrder implements OrderInterface
 {
-    /** @param LineItemInterface[]       $items
-     *  @param AncillaryInterface[]|null $ancillaries
-     *  @param PaymentInterface[]        $payments
+    /**
+     * @param LineItemInterface[]       $items
+     * @param AncillaryInterface[]|null $ancillaries
+     * @param PaymentInterface[]        $payments
+     * @param NoteDto[]|null            $notes
      */
     public function __construct(
         public string $originRef = 'CASSA-2026-00412',
@@ -27,7 +30,7 @@ final class StubOrder implements OrderInterface
         public string $channel = 'in-store',
         public ?string $operatorId = 'usr_042',
         public string $orderedAt = '2026-03-21T10:44:11Z',
-        public ?string $notes = 'Customer requested care sheet',
+        public ?array $notes = null,
         public CustomerInterface $customer = new StubCustomer(),
         public FulfilmentInterface $fulfilment = new StubFulfilment(),
         public array $items = [],
@@ -68,7 +71,8 @@ final class StubOrder implements OrderInterface
         return $this->orderedAt;
     }
 
-    public function getNotes(): ?string
+    /** @return NoteDto[]|null */
+    public function getNotes(): ?array
     {
         return $this->notes;
     }

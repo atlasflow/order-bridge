@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Atlasflow\OrderBridge\Tests\Fixtures;
 
 use Atlasflow\OrderBridge\Contracts\LineItemInterface;
+use Atlasflow\OrderBridge\Dto\NoteDto;
 
 /** Default values reproduce the §4 example line item. */
 final class StubLineItem implements LineItemInterface
@@ -19,7 +20,7 @@ final class StubLineItem implements LineItemInterface
         public string $vatRate = '0.00',
         public ?string $batch = 'BATCH-2024-TF-009',
         public ?string $passport = 'GB-12345-A',
-        public ?string $notes = 'item is located somewhere else',
+        public ?NoteDto $notes = null,
     ) {
     }
 
@@ -68,7 +69,7 @@ final class StubLineItem implements LineItemInterface
         return $this->passport;
     }
 
-    public function getNotes(): ?string
+    public function getNotes(): ?NoteDto
     {
         return $this->notes;
     }

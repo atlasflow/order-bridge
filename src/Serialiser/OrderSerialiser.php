@@ -10,6 +10,7 @@ use Atlasflow\OrderBridge\Contracts\FulfilmentInterface;
 use Atlasflow\OrderBridge\Contracts\LineItemInterface;
 use Atlasflow\OrderBridge\Contracts\OrderInterface;
 use Atlasflow\OrderBridge\Contracts\PaymentInterface;
+use Atlasflow\OrderBridge\Dto\NoteDto;
 use Atlasflow\OrderBridge\SchemaVersion;
 use Atlasflow\OrderBridge\Support\DecimalMath;
 use Atlasflow\OrderBridge\Support\TransferIdManager;
@@ -94,6 +95,9 @@ final class OrderSerialiser
         $ancillaries = $order->getAncillaries() !== null
             ? array_map([$this, 'serialiseAncillary'], $order->getAncillaries())
             : null;
+        $notes = $order->getNotes() !== null
+            ? array_map([$this, 'serialiseNote'], $order->getNotes())
+            : null;
 
         $totals = $this->computeTotals($items, $ancillaries ?? [], $order->getRefundOf());
 
@@ -103,7 +107,7 @@ final class OrderSerialiser
             'channel' => $order->getChannel(),
             'operator_id' => $order->getOperatorId(),
             'ordered_at' => $order->getOrderedAt(),
-            'notes' => $order->getNotes(),
+            'notes' => $notes,
             'customer' => $this->serialiseCustomer($order->getCustomer()),
             'fulfilment' => $this->serialiseFulfilment($order->getFulfilment()),
             'items' => $items,
@@ -154,6 +158,10 @@ final class OrderSerialiser
             SchemaVersion::monetaryScale(),
         );
 
+        $note = $item->getNotes() !== null
+            ? $this->serialiseNote($item->getNotes())
+            : null;
+
         return [
             'sku' => $item->getSku(),
             'name' => $item->getName(),
@@ -164,7 +172,7 @@ final class OrderSerialiser
             'vat_rate' => $vatRate,
             'batch' => $item->getBatch(),
             'passport' => $item->getPassport(),
-            'notes' => $item->getNotes(),
+            'note' => $note,
             'line_ex_vat' => $lineExVat,
             'line_vat' => $lineVat,
         ];
@@ -209,6 +217,21 @@ final class OrderSerialiser
             'description' => $ancillary->getDescription(),
             'total_ex_vat' => $totalExVat,
             'total_vat' => $totalVat,
+        ];
+    }
+
+    // -------------------------------------------------------------------------
+    // Note
+    // -------------------------------------------------------------------------
+
+    /** @return array<string, string> */
+    private function serialiseNote(NoteDto $note): array
+    {
+        return [
+            'type' => $note->type,
+            'note' => $note->note,
+            'created_by' => $note->createdBy,
+            'created_at' => $note->createdAt,
         ];
     }
 

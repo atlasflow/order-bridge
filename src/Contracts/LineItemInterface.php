@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Atlasflow\OrderBridge\Contracts;
 
+use Atlasflow\OrderBridge\Dto\NoteDto;
+
 /**
  * Represents a single product line within an order.
  *
@@ -45,6 +47,6 @@ interface LineItemInterface
     /** Plant passport identifier. Null for non-regulated items. */
     public function getPassport(): ?string;
 
-    /** Optional free-text notes for this line. */
-    public function getNotes(): ?string;
+    /** Optional structured note for this line. Null if not applicable. */
+    public function getNotes(): ?NoteDto;
 }

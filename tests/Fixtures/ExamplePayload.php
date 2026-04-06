@@ -19,7 +19,7 @@ final class ExamplePayload
     public static function valid(): array
     {
         return [
-            'schema_version' => '1.3.4',
+            'schema_version' => '1.4.1',
             'generated_at' => '2026-03-21T10:45:00Z',
             'transfer_id' => '7322b271-e5e2-42d9-a42e-e4c4fb45a3f8',
             'trigger' => 'realtime',
@@ -36,7 +36,14 @@ final class ExamplePayload
                     'channel' => 'in-store',
                     'operator_id' => 'usr_042',
                     'ordered_at' => '2026-03-21T10:44:11Z',
-                    'notes' => 'Customer requested care sheet',
+                    'notes' => [
+                        [
+                            'type' => 'customer',
+                            'note' => 'Customer requested care sheet',
+                            'created_by' => 'usr_042',
+                            'created_at' => '2026-03-21T10:44:11Z',
+                        ],
+                    ],
                     'customer' => [
                         'type' => 'registered',
                         'id' => 'cust_1089',
@@ -56,7 +63,12 @@ final class ExamplePayload
                             'vat_rate' => '0.00',
                             'batch' => 'BATCH-2024-TF-009',
                             'passport' => 'GB-12345-A',
-                            'notes' => 'item is located somewhere else',
+                            'note' => [
+                                'type' => 'ops',
+                                'note' => 'item is located somewhere else',
+                                'created_by' => 'usr_042',
+                                'created_at' => '2026-03-21T10:44:11Z',
+                            ],
                             'line_ex_vat' => '76.6980',
                             'line_vat' => '0.0000',
                         ],

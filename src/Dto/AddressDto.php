@@ -15,6 +15,7 @@ final readonly class AddressDto
         public string $postcode,
         public ?string $region,
         public string $country,
+        public ?int $addressId,
     ) {
     }
 }

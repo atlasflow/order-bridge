@@ -24,7 +24,7 @@ final class SchemaVersion
     // -------------------------------------------------------------------------
 
     /** Current schema version as declared in the spec title and §2.1. */
-    public const string SCHEMA_VERSION = '1.3.4';
+    public const string SCHEMA_VERSION = '1.4.1';
 
     /** Arithmetic tolerance used in §5.3 validation rules. */
     public const string TOLERANCE = '0.0001';

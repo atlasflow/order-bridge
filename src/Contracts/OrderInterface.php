@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Atlasflow\OrderBridge\Contracts;
 
+use Atlasflow\OrderBridge\Dto\NoteDto;
+
 /**
  * Represents a single order as provided by the host application.
  *
@@ -30,8 +32,12 @@ interface OrderInterface
     /** UTC timestamp of order creation in ISO 8601 format (YYYY-MM-DDThh:mm:ssZ). */
     public function getOrderedAt(): string;
 
-    /** Optional free-text order-level notes. */
-    public function getNotes(): ?string;
+    /**
+     * Optional order-level notes. Null when no notes are present.
+     *
+     * @return NoteDto[]|null
+     */
+    public function getNotes(): ?array;
 
     /** Customer information. */
     public function getCustomer(): CustomerInterface;

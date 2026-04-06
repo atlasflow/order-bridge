@@ -11,6 +11,7 @@ final readonly class OrderDto
      * @param LineItemDto[]       $items
      * @param AncillaryDto[]|null $ancillaries
      * @param PaymentDto[]        $payments
+     * @param NoteDto[]           $notes
      */
     public function __construct(
         public string $originRef,
@@ -18,13 +19,13 @@ final readonly class OrderDto
         public string $channel,
         public ?string $operatorId,
         public string $orderedAt,
-        public ?string $notes,
         public CustomerDto $customer,
         public FulfilmentDto $fulfilment,
         public array $items,
         public ?array $ancillaries,
         public TotalsDto $totals,
         public array $payments,
+        public array $notes,
     ) {
     }
 }
