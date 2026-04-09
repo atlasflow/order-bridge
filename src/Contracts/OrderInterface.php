@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Atlasflow\OrderBridge\Contracts;
 
 use Atlasflow\OrderBridge\Dto\NoteDto;
+use Atlasflow\OrderBridge\Dto\TotalsDto;
 
 /**
  * Represents a single order as provided by the host application.
@@ -71,4 +72,6 @@ interface OrderInterface
      * Required when status is "refund". Must be null for completed orders.
      */
     public function getRefundOf(): ?string;
+
+    public function getSignature(): string;
 }

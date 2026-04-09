@@ -114,7 +114,7 @@ final class OrderSerialiser
             'ancillaries' => $ancillaries,
             'totals' => $totals,
             'payments' => array_map([$this, 'serialisePayment'], $order->getPayments()),
-            'signature' => $order->signature,
+            'signature' => $order->getSignature(),
         ];
     }
 
