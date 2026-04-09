@@ -117,6 +117,7 @@ final class InboundParser
             ancillaries: $ancillaries,
             totals: $this->mapTotals($data['totals']),
             payments: $payments,
+            signature: $data['signature'],
         );
     }
 
