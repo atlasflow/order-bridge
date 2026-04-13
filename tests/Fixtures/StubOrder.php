@@ -37,6 +37,7 @@ final class StubOrder implements OrderInterface
         public ?array $ancillaries = null,
         public array $payments = [],
         public ?string $refundOf = null,
+        public string $signature = '',
     ) {
         if ($this->items === []) {
             $this->items = [new StubLineItem()];
@@ -105,5 +106,10 @@ final class StubOrder implements OrderInterface
     public function getRefundOf(): ?string
     {
         return $this->refundOf;
+    }
+
+    public function getSignature(): string
+    {
+        return $this->signature;
     }
 }

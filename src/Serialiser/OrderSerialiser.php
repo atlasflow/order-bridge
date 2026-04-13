@@ -292,6 +292,7 @@ final class OrderSerialiser
             'phone' => $customer->getPhone(),
             'address' => $customer->getAddress(),
             'contact' => $customer->getContact(),
+            'account' => $customer->getCustomerAccount(),
         ];
     }
 

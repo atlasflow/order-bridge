@@ -47,4 +47,6 @@ interface CustomerInterface
 
     /** Designated contact name for the order. Required when type is "new" if available. */
     public function getContact(): ?string;
+
+    public function getCustomerAccount(): string;
 }
