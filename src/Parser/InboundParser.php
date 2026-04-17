@@ -276,6 +276,7 @@ final class InboundParser
             postcode: $data['postcode'],
             region: $data['region'] ?? null,
             country: $data['country'],
+            addressId: isset($data['address_id']) ? (int) $data['address_id'] : null,
         );
     }
 
