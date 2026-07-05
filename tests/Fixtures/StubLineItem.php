@@ -20,6 +20,7 @@ final class StubLineItem implements LineItemInterface
         public string $vatRate = '0.00',
         public ?string $batch = 'BATCH-2024-TF-009',
         public ?string $passport = 'GB-12345-A',
+        public ?string $giftcardCode = null,
         public ?NoteDto $notes = null,
     ) {
     }
@@ -67,6 +68,11 @@ final class StubLineItem implements LineItemInterface
     public function getPassport(): ?string
     {
         return $this->passport;
+    }
+
+    public function getGiftcardCode(): ?string
+    {
+        return $this->giftcardCode;
     }
 
     public function getNotes(): ?NoteDto

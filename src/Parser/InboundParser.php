@@ -142,6 +142,7 @@ final class InboundParser
             vatRate: $data['vat_rate'],
             batch: $data['batch'] ?? null,
             passport: $data['passport'] ?? null,
+            giftcardCode: $data['giftcard_code'] ?? null,
             note: $note,
             lineExVat: $data['line_ex_vat'],
             lineVat: $data['line_vat'],

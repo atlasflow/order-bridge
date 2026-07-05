@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Atlasflow\OrderBridge\Parser\InboundParser;
 use Atlasflow\OrderBridge\Serialiser\OrderSerialiser;
 use Atlasflow\OrderBridge\Tests\Fixtures\StubAncillary;
 use Atlasflow\OrderBridge\Tests\Fixtures\StubLineItem;
@@ -204,6 +205,63 @@ describe('refund order', function () {
 
         $payload = makeSerialiser()->serialise([$order], 'manual');
         expect($payload['orders'][0]['totals']['refund_of'])->toBe('core-order-abc-123');
+    });
+});
+
+// ---------------------------------------------------------------------------
+// Gift-card code line-item field (optional, additive)
+// ---------------------------------------------------------------------------
+
+describe('gift-card code line-item field', function () {
+    it('emits giftcard_code and survives serialise → parse round-trip', function () {
+        $order = new StubOrder(
+            items: [new StubLineItem(
+                qty: 1,
+                unitPrice: '25.0000',
+                discount: '0.000000',
+                vatRate: '0.00',
+                giftcardCode: 'GC-ABC-123',
+            )],
+            payments: [new StubPayment(amount: '25.0000')],
+        );
+
+        $payload = makeSerialiser()->serialise([$order], 'realtime', '1');
+        expect($payload['orders'][0]['items'][0]['giftcard_code'])->toBe('GC-ABC-123');
+
+        $json = json_encode($payload, JSON_THROW_ON_ERROR);
+        $envelope = (new InboundParser())->parse($json);
+        expect($envelope->orders[0]->items[0]->giftcardCode)->toBe('GC-ABC-123');
+    });
+
+    it('serialises giftcard_code as null and parses back to null when absent', function () {
+        $order = new StubOrder(
+            items: [new StubLineItem(
+                qty: 1,
+                unitPrice: '25.0000',
+                discount: '0.000000',
+                vatRate: '0.00',
+            )],
+            payments: [new StubPayment(amount: '25.0000')],
+        );
+
+        $payload = makeSerialiser()->serialise([$order], 'realtime', '1');
+        expect($payload['orders'][0]['items'][0]['giftcard_code'])->toBeNull();
+
+        $envelope = (new InboundParser())->parse(json_encode($payload, JSON_THROW_ON_ERROR));
+        expect($envelope->orders[0]->items[0]->giftcardCode)->toBeNull();
+    });
+
+    it('parses a payload with no giftcard_code key at all', function () {
+        $order = new StubOrder(
+            items: [new StubLineItem(qty: 1, unitPrice: '25.0000', discount: '0.000000', vatRate: '0.00')],
+            payments: [new StubPayment(amount: '25.0000')],
+        );
+
+        $payload = makeSerialiser()->serialise([$order], 'realtime', '1');
+        unset($payload['orders'][0]['items'][0]['giftcard_code']);
+
+        $envelope = (new InboundParser())->parse(json_encode($payload, JSON_THROW_ON_ERROR));
+        expect($envelope->orders[0]->items[0]->giftcardCode)->toBeNull();
     });
 });
 

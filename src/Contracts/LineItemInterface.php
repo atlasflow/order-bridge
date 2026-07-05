@@ -47,6 +47,9 @@ interface LineItemInterface
     /** Plant passport identifier. Null for non-regulated items. */
     public function getPassport(): ?string;
 
+    /** Scanned gift-card code carried on this line (sale/top-up). Null if not applicable. */
+    public function getGiftcardCode(): ?string;
+
     /** Optional structured note for this line. Null if not applicable. */
     public function getNotes(): ?NoteDto;
 }

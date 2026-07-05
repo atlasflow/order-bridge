@@ -173,6 +173,7 @@ final class OrderSerialiser
             'vat_rate' => $vatRate,
             'batch' => $item->getBatch(),
             'passport' => $item->getPassport(),
+            'giftcard_code' => $item->getGiftcardCode(),
             'note' => $note,
             'line_ex_vat' => $lineExVat,
             'line_vat' => $lineVat,

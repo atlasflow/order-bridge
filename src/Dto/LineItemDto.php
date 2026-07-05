@@ -20,6 +20,7 @@ final readonly class LineItemDto
         public string $vatRate,
         public ?string $batch,
         public ?string $passport,
+        public ?string $giftcardCode,
         public ?NoteDto $note,
         /** Derived: qty × unit_price × (100 − discount) / 100. 4 decimal places. */
         public string $lineExVat,

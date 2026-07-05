@@ -20,6 +20,7 @@ final class StubCustomer implements CustomerInterface
         public ?string $phone = null,
         public ?array $address = null,
         public ?string $contact = null,
+        public string $customerAccount = 'acct_default',
     ) {
     }
 
@@ -59,5 +60,10 @@ final class StubCustomer implements CustomerInterface
     public function getContact(): ?string
     {
         return $this->contact;
+    }
+
+    public function getCustomerAccount(): string
+    {
+        return $this->customerAccount;
     }
 }
