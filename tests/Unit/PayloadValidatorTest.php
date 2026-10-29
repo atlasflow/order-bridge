@@ -303,7 +303,7 @@ describe('discount_voucher validation', function () {
     it('rejects a percentage of zero, above 100, non-numeric, or at the wrong scale', function (string $percentage) {
         $result = validate(payloadWithVoucher(['code' => 'X', 'percentage' => $percentage]));
         expect(hasViolation($result, 'invalid_discount_voucher_percentage'))->toBeTrue();
-    })->with(['0.000000', '100.000001', 'abc', '10', '10.00', '10.0000000', '-5.000000']);
+    })->with(['0.000000', '100.000001', 'abc', '10', '10.00', '10.0000000', '-5.000000', "10.000000\n"]);
 
     it('rejects a voucher that is not an object', function () {
         expect(hasViolation(validate(payloadWithVoucher('SPRING10')), 'invalid_discount_voucher'))->toBeTrue();

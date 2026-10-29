@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1]
+
+### Fixed
+
+- A discount-voucher `percentage` with a trailing newline passed the format check and made `bccomp()` throw `ValueError`; the pattern is now anchored with `\A`/`\z`, so it is reported as `invalid_discount_voucher_percentage`.
+
 ## [1.4.0]
 
 ### Added

@@ -359,7 +359,7 @@ final class PayloadValidator
         $percentage = $voucher['percentage'] ?? null;
         $scale = SchemaVersion::discountScale();
         $valid = is_string($percentage)
-            && preg_match('/^\d+(\.\d{' . $scale . '})$/', $percentage) === 1
+            && preg_match('/\A\d+\.\d{' . $scale . '}\z/', $percentage) === 1
             && bccomp($percentage, '0', $scale) > 0
             && bccomp($percentage, '100', $scale) <= 0;
         if (!$valid) {
