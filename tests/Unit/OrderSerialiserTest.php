@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Atlasflow\OrderBridge\Parser\InboundParser;
+use Atlasflow\OrderBridge\SchemaVersion;
 use Atlasflow\OrderBridge\Serialiser\OrderSerialiser;
 use Atlasflow\OrderBridge\Tests\Fixtures\StubAncillary;
 use Atlasflow\OrderBridge\Tests\Fixtures\StubLineItem;
@@ -28,9 +29,9 @@ function makeSerialiser(array $configOverrides = []): OrderSerialiser
 // ---------------------------------------------------------------------------
 
 describe('envelope fields', function () {
-    it('sets schema_version to 1.4.2', function () {
+    it('sets schema_version to the package constant', function () {
         $payload = makeSerialiser()->serialise([new StubOrder()], 'realtime');
-        expect($payload['schema_version'])->toBe('1.4.2');
+        expect($payload['schema_version'])->toBe(SchemaVersion::SCHEMA_VERSION);
     });
 
     it('sets trigger from argument', function () {

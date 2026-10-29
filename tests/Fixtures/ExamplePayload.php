@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Atlasflow\OrderBridge\Tests\Fixtures;
 
+use Atlasflow\OrderBridge\SchemaVersion;
+
 /**
  * The canonical §4 example payload from the Atlas Core Order Bridge API
- * specification (version 1.4.2), with corrected arithmetic values.
+ * specification (version 1.4.x), with corrected arithmetic values.
  *
  * Corrections applied vs. the raw spec document:
  * - ancillary.total_ex_vat: "3.9990" → "34.9900" (formula: qty × unit_price = 1 × 34.9900)
@@ -19,7 +21,7 @@ final class ExamplePayload
     public static function valid(): array
     {
         return [
-            'schema_version' => '1.4.2',
+            'schema_version' => SchemaVersion::SCHEMA_VERSION,
             'generated_at' => '2026-03-21T10:45:00Z',
             'transfer_id' => '7322b271-e5e2-42d9-a42e-e4c4fb45a3f8',
             'trigger' => 'realtime',
@@ -105,6 +107,7 @@ final class ExamplePayload
                             'date' => '2026-03-21T10:44:11Z',
                         ],
                     ],
+                    'signature' => '',
                 ],
             ],
         ];
