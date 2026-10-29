@@ -20,6 +20,8 @@ use Atlasflow\OrderBridge\Support\DecimalMath;
 final class PayloadValidator
 {
     private const array VALID_TRIGGERS = ['realtime', 'eod_batch', 'manual', 'offline_flush', 'push'];
+    private const int DISCOUNT_VOUCHER_CODE_MAX_LENGTH = 64;
+
     private const array VALID_STATUSES = ['pos', 'order', 'refund'];
     private const array VALID_CUSTOMER_TYPES = ['anonymous', 'registered', 'new'];
     private const array VALID_FULFILMENT_TYPES = ['collection', 'delivery'];
@@ -204,6 +206,11 @@ final class PayloadValidator
             ));
         }
 
+        // discount_voucher (optional)
+        if (array_key_exists('discount_voucher', $order) && $order['discount_voucher'] !== null) {
+            $this->validateDiscountVoucher($order['discount_voucher'], $prefix, $result);
+        }
+
         // ordered_at timestamp
         $orderedAt = $order['ordered_at'] ?? null;
         if (is_string($orderedAt) && !preg_match(self::ISO8601_UTC_PATTERN, $orderedAt)) {
@@ -320,6 +327,50 @@ final class PayloadValidator
 
         // Validate payments and sum
         $this->validatePayments($payments, $totals, $prefix, $result);
+    }
+
+    private function validateDiscountVoucher(mixed $voucher, string $prefix, ValidationResult $result): void
+    {
+        $path = "{$prefix}.discount_voucher";
+
+        if (!is_array($voucher)) {
+            $result->addViolation(new ValidationViolation(
+                $path,
+                'invalid_discount_voucher',
+                "{$path} must be an object with code and percentage.",
+                null,
+                $voucher,
+            ));
+
+            return;
+        }
+
+        $code = $voucher['code'] ?? null;
+        if (!is_string($code) || $code === '' || mb_strlen($code) > self::DISCOUNT_VOUCHER_CODE_MAX_LENGTH) {
+            $result->addViolation(new ValidationViolation(
+                "{$path}.code",
+                'invalid_discount_voucher_code',
+                "{$path}.code must be a non-empty string of at most " . self::DISCOUNT_VOUCHER_CODE_MAX_LENGTH . ' characters.',
+                null,
+                $code,
+            ));
+        }
+
+        $percentage = $voucher['percentage'] ?? null;
+        $scale = SchemaVersion::discountScale();
+        $valid = is_string($percentage)
+            && preg_match('/^\d+(\.\d{' . $scale . '})$/', $percentage) === 1
+            && bccomp($percentage, '0', $scale) > 0
+            && bccomp($percentage, '100', $scale) <= 0;
+        if (!$valid) {
+            $result->addViolation(new ValidationViolation(
+                "{$path}.percentage",
+                'invalid_discount_voucher_percentage',
+                "{$path}.percentage must be a decimal string greater than 0 and at most 100, with exactly {$scale} decimal places.",
+                null,
+                $percentage,
+            ));
+        }
     }
 
     /** @param array<string, mixed> $customer */

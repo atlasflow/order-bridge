@@ -270,3 +270,42 @@ describe('ValidationResult::assertValid', function () {
             ->toThrow(\Atlasflow\OrderBridge\Exceptions\ValidationException::class);
     });
 });
+
+// ---------------------------------------------------------------------------
+// Optional order-level discount voucher
+// ---------------------------------------------------------------------------
+
+describe('discount_voucher validation', function () {
+    /** @return array<string, mixed> */
+    function payloadWithVoucher(mixed $voucher): array
+    {
+        $payload = validPayload();
+        $payload['orders'][0]['discount_voucher'] = $voucher;
+
+        return $payload;
+    }
+
+    it('accepts an absent or null voucher', function () {
+        expect(validate(validPayload())->isValid())->toBeTrue();
+        expect(validate(payloadWithVoucher(null))->isValid())->toBeTrue();
+    });
+
+    it('accepts a well-formed voucher, including the 64-char and 100 boundaries', function () {
+        expect(validate(payloadWithVoucher(['code' => 'SPRING10', 'percentage' => '10.000000']))->isValid())->toBeTrue();
+        expect(validate(payloadWithVoucher(['code' => str_repeat('A', 64), 'percentage' => '100.000000']))->isValid())->toBeTrue();
+    });
+
+    it('rejects an empty or over-long code', function () {
+        expect(hasViolation(validate(payloadWithVoucher(['code' => '', 'percentage' => '10.000000'])), 'invalid_discount_voucher_code'))->toBeTrue();
+        expect(hasViolation(validate(payloadWithVoucher(['code' => str_repeat('A', 65), 'percentage' => '10.000000'])), 'invalid_discount_voucher_code'))->toBeTrue();
+    });
+
+    it('rejects a percentage of zero, above 100, non-numeric, or at the wrong scale', function (string $percentage) {
+        $result = validate(payloadWithVoucher(['code' => 'X', 'percentage' => $percentage]));
+        expect(hasViolation($result, 'invalid_discount_voucher_percentage'))->toBeTrue();
+    })->with(['0.000000', '100.000001', 'abc', '10', '10.00', '10.0000000', '-5.000000']);
+
+    it('rejects a voucher that is not an object', function () {
+        expect(hasViolation(validate(payloadWithVoucher('SPRING10')), 'invalid_discount_voucher'))->toBeTrue();
+    });
+});
