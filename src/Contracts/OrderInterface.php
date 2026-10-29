@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Atlasflow\OrderBridge\Contracts;
 
+use Atlasflow\OrderBridge\Dto\DiscountVoucherDto;
 use Atlasflow\OrderBridge\Dto\NoteDto;
 use Atlasflow\OrderBridge\Dto\TotalsDto;
 
@@ -72,6 +73,12 @@ interface OrderInterface
      * Required when status is "refund". Must be null for completed orders.
      */
     public function getRefundOf(): ?string;
+
+    /**
+     * Discount voucher applied to this order, or null when none was used.
+     * Informational: the discount itself is carried by each line's `discount`.
+     */
+    public function getDiscountVoucher(): ?DiscountVoucherDto;
 
     public function getSignature(): string;
 }

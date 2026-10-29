@@ -8,6 +8,7 @@ use Atlasflow\OrderBridge\Dto\AddressDto;
 use Atlasflow\OrderBridge\Dto\AncillaryDto;
 use Atlasflow\OrderBridge\Dto\CustomerDto;
 use Atlasflow\OrderBridge\Dto\DeliverySlotDto;
+use Atlasflow\OrderBridge\Dto\DiscountVoucherDto;
 use Atlasflow\OrderBridge\Dto\EnvelopeDto;
 use Atlasflow\OrderBridge\Dto\FulfilmentDto;
 use Atlasflow\OrderBridge\Dto\LineItemDto;
@@ -92,6 +93,16 @@ final class InboundParser
     // Order
     // -------------------------------------------------------------------------
 
+    /** @param array<string, mixed>|null $data */
+    private function mapDiscountVoucher(?array $data): ?DiscountVoucherDto
+    {
+        if ($data === null) {
+            return null;
+        }
+
+        return new DiscountVoucherDto(code: $data['code'], percentage: $data['percentage']);
+    }
+
     /** @param array<string, mixed> $data */
     private function mapOrder(array $data): OrderDto
     {
@@ -118,6 +129,7 @@ final class InboundParser
             totals: $this->mapTotals($data['totals']),
             payments: $payments,
             signature: $data['signature'],
+            discountVoucher: $this->mapDiscountVoucher($data['discount_voucher'] ?? null),
         );
     }
 

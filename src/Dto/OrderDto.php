@@ -26,7 +26,8 @@ final readonly class OrderDto
         public TotalsDto $totals,
         public array $payments,
         public ?array $notes,
-        public string $signature
+        public string $signature,
+        public ?DiscountVoucherDto $discountVoucher = null,
     ) {
     }
 }

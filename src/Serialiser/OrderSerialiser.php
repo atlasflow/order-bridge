@@ -10,6 +10,7 @@ use Atlasflow\OrderBridge\Contracts\FulfilmentInterface;
 use Atlasflow\OrderBridge\Contracts\LineItemInterface;
 use Atlasflow\OrderBridge\Contracts\OrderInterface;
 use Atlasflow\OrderBridge\Contracts\PaymentInterface;
+use Atlasflow\OrderBridge\Dto\DiscountVoucherDto;
 use Atlasflow\OrderBridge\Dto\NoteDto;
 use Atlasflow\OrderBridge\SchemaVersion;
 use Atlasflow\OrderBridge\Support\DecimalMath;
@@ -114,8 +115,19 @@ final class OrderSerialiser
             'ancillaries' => $ancillaries,
             'totals' => $totals,
             'payments' => array_map([$this, 'serialisePayment'], $order->getPayments()),
+            'discount_voucher' => $this->serialiseDiscountVoucher($order->getDiscountVoucher()),
             'signature' => $order->getSignature(),
         ];
+    }
+
+    /** @return array{code: string, percentage: string}|null */
+    private function serialiseDiscountVoucher(?DiscountVoucherDto $voucher): ?array
+    {
+        if ($voucher === null) {
+            return null;
+        }
+
+        return ['code' => $voucher->code, 'percentage' => $voucher->percentage];
     }
 
     // -------------------------------------------------------------------------

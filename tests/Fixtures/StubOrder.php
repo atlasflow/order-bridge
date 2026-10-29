@@ -10,6 +10,7 @@ use Atlasflow\OrderBridge\Contracts\FulfilmentInterface;
 use Atlasflow\OrderBridge\Contracts\LineItemInterface;
 use Atlasflow\OrderBridge\Contracts\OrderInterface;
 use Atlasflow\OrderBridge\Contracts\PaymentInterface;
+use Atlasflow\OrderBridge\Dto\DiscountVoucherDto;
 use Atlasflow\OrderBridge\Dto\NoteDto;
 
 /**
@@ -38,6 +39,7 @@ final class StubOrder implements OrderInterface
         public array $payments = [],
         public ?string $refundOf = null,
         public string $signature = '',
+        public ?DiscountVoucherDto $discountVoucher = null,
     ) {
         if ($this->items === []) {
             $this->items = [new StubLineItem()];
@@ -106,6 +108,11 @@ final class StubOrder implements OrderInterface
     public function getRefundOf(): ?string
     {
         return $this->refundOf;
+    }
+
+    public function getDiscountVoucher(): ?DiscountVoucherDto
+    {
+        return $this->discountVoucher;
     }
 
     public function getSignature(): string

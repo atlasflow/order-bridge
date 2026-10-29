@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Atlasflow\OrderBridge\Dto\DiscountVoucherDto;
 use Atlasflow\OrderBridge\Parser\InboundParser;
 use Atlasflow\OrderBridge\SchemaVersion;
 use Atlasflow\OrderBridge\Serialiser\OrderSerialiser;
@@ -263,6 +264,49 @@ describe('gift-card code line-item field', function () {
 
         $envelope = (new InboundParser())->parse(json_encode($payload, JSON_THROW_ON_ERROR));
         expect($envelope->orders[0]->items[0]->giftcardCode)->toBeNull();
+    });
+});
+
+function plainOrder(): StubOrder
+{
+    return new StubOrder(
+        items: [new StubLineItem(qty: 1, unitPrice: '25.0000', discount: '0.000000', vatRate: '0.00')],
+        payments: [new StubPayment(amount: '25.0000')],
+    );
+}
+
+describe('discount voucher order field', function () {
+    it('emits discount_voucher and survives serialise → parse → validate', function () {
+        $order = new StubOrder(
+            items: [new StubLineItem(qty: 1, unitPrice: '25.0000', discount: '10.000000', vatRate: '0.00')],
+            payments: [new StubPayment(amount: '22.5000')],
+            discountVoucher: new DiscountVoucherDto('SPRING10', '10.000000'),
+        );
+
+        $payload = makeSerialiser()->serialise([$order], 'realtime', '1');
+        expect($payload['orders'][0]['discount_voucher'])->toBe(['code' => 'SPRING10', 'percentage' => '10.000000']);
+        expect($payload['orders'][0]['totals']['grand_total'])->toBe('22.5000');
+        expect((new \Atlasflow\OrderBridge\Validator\PayloadValidator())->validate($payload)->isValid())->toBeTrue();
+
+        $envelope = (new InboundParser())->parse(json_encode($payload, JSON_THROW_ON_ERROR));
+        expect($envelope->orders[0]->discountVoucher)->toEqual(new DiscountVoucherDto('SPRING10', '10.000000'));
+    });
+
+    it('serialises discount_voucher as null and parses back to null when absent', function () {
+        $payload = makeSerialiser()->serialise([plainOrder()], 'realtime', '1');
+        expect($payload['orders'][0])->toHaveKey('discount_voucher');
+        expect($payload['orders'][0]['discount_voucher'])->toBeNull();
+
+        $envelope = (new InboundParser())->parse(json_encode($payload, JSON_THROW_ON_ERROR));
+        expect($envelope->orders[0]->discountVoucher)->toBeNull();
+    });
+
+    it('parses a legacy payload with no discount_voucher key at all', function () {
+        $payload = makeSerialiser()->serialise([plainOrder()], 'realtime', '1');
+        unset($payload['orders'][0]['discount_voucher']);
+
+        $envelope = (new InboundParser())->parse(json_encode($payload, JSON_THROW_ON_ERROR));
+        expect($envelope->orders[0]->discountVoucher)->toBeNull();
     });
 });
 
